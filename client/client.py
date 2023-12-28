@@ -10,7 +10,6 @@ DISCONNECT_MESSAGE = "DISCONNECT_SERVER_CODE"
 USERNAME_MESSAGE = "EXAMPLE_APP_USERNAME_FIELD"
 SEP = "///**//"
 
-
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
