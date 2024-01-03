@@ -1,5 +1,5 @@
 import socket
-from threading import Thread
+import threading
 
 HEADER = 64
 IP = socket.gethostbyname(socket.gethostname())
@@ -52,8 +52,8 @@ if __name__ == "__main__":
         send(f"{username}{SEP}{USERNAME_MESSAGE}")
         to_username = input("Who will you send messages to: ")
         print("You can write your message and press enter. Type 'disconnect' to exit.")
-        main_thread = Thread(target=main, args=(username, to_username,))
-        listen_thread = Thread(target=listen, args=(username,))
+        main_thread = threading.Thread(target=main, args=(username, to_username,))
+        listen_thread = threading.Thread(target=listen, args=(username,))
         main_thread.daemon = True
         main_thread.start()
         listen_thread.start()
