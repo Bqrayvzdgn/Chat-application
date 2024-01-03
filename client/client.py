@@ -13,20 +13,32 @@ SEP = "///**//"
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
+def send_username(username):
+    send(f"{USERNAME_MESSAGE}{SEP}{username}")
+
 def send(msg):
-    message = msg.encode(FORMAT)
-    msg_length = str(len(message)).encode(FORMAT)
-    header = msg_length + b' ' * (HEADER - len(msg_length))
-    client.send(header)
-    client.send(message)
+    send_data(client, msg)
+
+def send_data(connection, data):
+    msg = data.encode(FORMAT)
+    msg_length = len(msg)
+    header = str(msg_length).encode(FORMAT)
+    header += b' ' * (HEADER - len(header))
+    connection.send(header)
+    connection.send(msg)
 
 def main(username, to_username):
-    while True:
-        message = input("")
-        if message.lower() == "disconnect":
-            send(f"{username}{SEP}{DISCONNECT_MESSAGE}")
-            break
-        send(f"{username}{SEP}{to_username}{SEP}{message}")
+    try:
+        while True:
+            message = input("Your message: ")
+            if message.lower() == "disconnect":
+                print("You disconnected.")
+                break
+            send(f"{username}{SEP}{to_username}{SEP}{message}")
+    except KeyboardInterrupt:
+        print("You disconnected.")
+        send(f"{username}{SEP}{DISCONNECT_MESSAGE}")
+
 
 def listen(username):
     connected = True
@@ -39,17 +51,19 @@ def listen(username):
                 messages = msg.split(SEP)
                 if len(messages) > 2:
                     if messages[1] == username:
-                        print(f"\n {messages[0]} -->  {messages[2]} \n")
+                        print(f"\n You -->  {messages[2]}\n")
                     else:
-                        print("Security issue: Check server.py")
+                        print(f"\n{messages[0]} --> {messages[2]}\n")
+
         except ConnectionResetError:
             print("Connection closed by server.")
+            connected = False
             break
 
 if __name__ == "__main__":
     username = input("Please write your user name: ")
     if username:
-        send(f"{username}{SEP}{USERNAME_MESSAGE}")
+        send_username(username)
         to_username = input("Who will you send messages to: ")
         print("You can write your message and press enter. Type 'disconnect' to exit.")
         main_thread = threading.Thread(target=main, args=(username, to_username,))
